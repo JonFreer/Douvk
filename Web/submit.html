@@ -1,0 +1,277 @@
+<html>
+
+<head>
+    <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
+    <link rel="shortcut icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <script>
+
+
+    </script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:700" rel="stylesheet">
+    <style>
+        #douvk {
+            z-index: 5;
+            position: absolute;
+            top: 10px;
+            font-size: 2.5em;
+            color: #505050;
+            text-decoration: none;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+            color: #505050;
+
+        }
+
+        button {
+            font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+            border: 1px solid #ccc;
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+            background-color: white;
+            font-size: 1em;
+            color: #505050;
+            width: 50%;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            border: 1px solid #ccc;
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+            width: 40%;
+        }
+
+        /* button:hover {
+            box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.24), 0 4px 50px 0 rgba(0, 0, 0, 0.19);
+        } */
+
+        #myProgress {
+            width: 100%;
+            background-color: #e2e2e2;
+        }
+
+        #myBar {
+            width: 0%;
+            height: 30px;
+            background-color: green;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        #container {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+
+        #drop_zone {
+            margin: 25px;
+            border: 2px dashed #bbb;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            padding: 25px;
+            text-align: center;
+            font: 20pt bold 'Vollkorn';
+            color: #bbb;
+        }
+    </style>
+    <title>
+        DOUVK
+    </title>
+</head>
+
+<body>
+    <a id="douvk" href="index.html">#DOUVK</a>
+    <div id="container">
+        <h1>Submit Images to Douvk</h1>
+        <div>
+            <label id="inputName" for="inputElement" class="custom-file-upload">
+                <i  class="fa fa-cloud-upload"></i> Choose Files
+            </label>
+            <input id="inputElement" type="file" multiple accept="image/*" />
+            <!-- <input id="inputElement" type="file" multiple accept="image/*" /> -->
+            <button type="button" onclick="buttonPress()">Upload Images</button>
+        </div>
+        <div id="drop_zone">Drop files here</div>
+        <output id="list"></output>
+        <div id="myProgress">
+            <div id="myBar"></div>
+        </div>
+
+        <p>
+            Max video size upload: 5MB.
+            Max displayable length: 5 seconds
+            <br>
+        </p>
+        <p>
+            
+            Changelog: 
+            <br>1.08 Added Douvk Wall (<a href="/all.html">Click here or on the time</a>)
+            <br>1.07 Added more controls, including keyboard
+            <br>1.06 Imporved Security
+            <br>1.05 Added Speed Controls
+            <br>1.04 Added Video Support
+            <br>1.03 Removed True Random, Fixed AJ Pic
+            <br>1.02 Added Gif support
+            <br>1.01 Imporoved Preformance
+            <br>
+            <br>
+            Found a bug? Email contact@douvk.co.uk
+        </p>
+    </div>
+
+    <script>
+
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBw-iGyHNxICd_9BbZfHu5IyNUc94STFvI",
+            authDomain: "douvk-51ac9.firebaseapp.com",
+            databaseURL: "https://douvk-51ac9.firebaseio.com",
+            projectId: "douvk-51ac9",
+            storageBucket: "douvk-51ac9.appspot.com",
+            messagingSenderId: "667447476369"
+        };
+        firebase.initializeApp(config);
+        var storage = firebase.storage();
+        var ref = storage.ref();
+        // Initialize Cloud Firestore through Firebase
+        var db = firebase.firestore();
+
+
+        //         db.collection("users").doc("test").set({
+        //     first: "Ada",
+        //     last: "Lovelace",
+        //     born: 1815
+        // })
+        // .then(function(docRef) {
+        //     console.log("Document written with ID: ", docRef.id);
+        // })
+        // .catch(function(error) {
+        //     console.error("Error adding document: ", error);
+        // });
+
+        //const ref = firebase.storage().ref();
+        inputElement = document.getElementById("inputElement")
+        function buttonPress() {
+            var fileList = inputElement.files;
+            console.log(fileList)
+            uploadImages(fileList)
+        }
+
+        inputElement.onchange = function (event) {
+            var fileList = inputElement.files;
+            document.getElementById("inputName").innerHTML=fileList.length+" Files Chosen"
+            
+            //TODO do something with fileList.  
+        }
+
+        function handleFileSelect(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+
+            var files = evt.dataTransfer.files; // FileList object.
+
+            // files is a FileList of File objects. List some properties.
+            var output = [];
+            var output2 = []
+            for (var i = 0, f; f = files[i]; i++) {
+                output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                    f.size, ' bytes, last modified: ',
+                    f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                    '</li>');
+                output2.push(f);
+            }
+            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+            //alert("uploading");
+            console.log(output2);
+            uploadImages(output2)
+        }
+
+        function uploadImages(output2) {
+            count = 0;
+            for (var i = 0, f; f = output2[i]; i++) {
+                file = f
+                if(file.size<5100000){
+                console.log(file.size)
+                const name = (+new Date()) + '-' + file.name;
+                const metadata = { contentType: file.type };
+                const task = ref.child("_main/"+name).put(file, metadata);
+                var urlSaved = ""
+                task
+                    .then(snapshot => snapshot.ref.getDownloadURL()).then(function(downloadURL) {
+                    // console.log('File available at', downloadURL);
+                    urlSaved =downloadURL
+                    db.collection("images_main").doc(name).set({
+                    metadata: metadata,
+                    url: urlSaved
+                })
+                    .then(function (docRef) {
+                        //console.log("Document written with ID: ", docRef.id);
+                        count++;
+                        move(count - 1, count, output2.length)
+                    })
+                    .catch(function (error) {
+                        console.error("Error adding document: ", error);
+                    });
+                         });
+                    //.then(url => urlSaved = url)
+
+                
+                }else{
+                    alert("File too big")
+                }
+
+            }
+        }
+
+        function handleDragOver(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+        }
+
+        // Setup the dnd listeners.
+        var dropZone = document.getElementById('drop_zone');
+        dropZone.addEventListener('dragover', handleDragOver, false);
+        dropZone.addEventListener('drop', handleFileSelect, false);
+
+        //
+
+        //Progress bar
+        function move(start, end, length) {
+            var elem = document.getElementById("myBar");
+            var width = (start / end) * 100;
+            var id = setInterval(frame, 10);
+            function frame() {
+                if (width >= (end * 100) / length) {
+                    clearInterval(id);
+                } else {
+                    width++;
+                    elem.style.width = width + '%';
+                }
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,274 @@
+<html>
+
+<head>
+    <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
+    <title>Douvk Wall</title>
+    <link rel="shortcut icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <script>
+        var loggedIn = localStorage.getItem('loggedIn');
+
+        var hash = "299265865"
+        var config = {
+            apiKey: "AIzaSyBw-iGyHNxICd_9BbZfHu5IyNUc94STFvI",
+            authDomain: "douvk-51ac9.firebaseapp.com",
+            databaseURL: "https://douvk-51ac9.firebaseio.com",
+            projectId: "douvk-51ac9",
+            storageBucket: "douvk-51ac9.appspot.com",
+            messagingSenderId: "667447476369"
+        };
+
+        String.prototype.hashCode = function () {
+            var hash = 0;
+            if (this.length == 0) return hash;
+            for (i = 0; i < this.length; i++) {
+                char = this.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash;
+        }
+
+        function checkPassword() {
+            x = prompt("Enter the Password");
+            if ((x.hashCode()) == hash) {
+                //console.log(x.hashCode());
+                localStorage.setItem('loggedIn', true)
+
+                main()
+            } else {
+                checkPassword()
+            }
+        }
+
+
+        var imageArray = []
+        var urlArray = []
+        divString = ""
+
+        firebase.initializeApp(config);
+        var storage = firebase.storage();
+
+        // Initialize Cloud Firestore through Firebase
+        var db = firebase.firestore();
+        var storageRef = storage.ref("_main/thumbs");
+        var storageRef2 = storage.ref("_main");
+        count = 0
+        // Disable deprecated features
+        function main() {
+            db.settings({
+                timestampsInSnapshots: true
+            });
+            db.collection("images_main").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    console.log(`${doc.id} => ${doc.data()}`);
+
+                    storageRef.child("thumb@256_" + doc.id).getDownloadURL().then(function (url) {
+                        var test = url;
+                        // alert(url);
+                        imageArray.push(test)
+
+                        storageRef2.child(doc.id).getDownloadURL().then(function (url) {
+                            //url is url of image
+                            count++
+                            urlArray.push(url)
+                            divString += '<div id="imagediv"><img id="img' + count + '" onclick="openModal(' + count + ')" class="myImg" src=' + test + '></div>'
+                            //document.getElementById('bg-image').style.backgroundImage = "url("+test+")"
+                            //document.getElementById("image").src=test;
+                            document.getElementById("boddy").innerHTML = divString
+                        })
+                    }).catch(function (error) {
+
+                    });
+
+
+                });
+
+            });
+        }
+        if (loggedIn == "true") {
+            main()
+
+        } else {
+            checkPassword()
+        }
+
+        // Get the modal
+
+
+        // Get the image and insert it inside the modal - use its "alt" text as a caption
+        //var img = document.getElementById('myImg');
+        var modalImg = document.getElementById("img01");
+        //var captionText = document.getElementById("caption");
+
+        function openModal(id) {
+            var modal = document.getElementById('myModal');
+            var img = document.getElementById('img' + id);
+            var modalImg = document.getElementById("img01");
+            //var captionText = document.getElementById("caption");
+            modal.style.display = "block";
+            modalImg.src = urlArray[id - 1];
+            //captionText.innerHTML = "Download";
+        }
+
+
+
+
+    </script>
+    <style>
+        /* Style the Image Used to Trigger the Modal */
+
+        .myImg {
+            /* height: 100%; */
+            width: 100%;
+            object-fit: contain;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .myImg:hover {
+            opacity: 0.7;
+        }
+
+        #imagediv {
+            /* height: 250; */
+        }
+
+        .grid-container {
+            padding: 10px;
+            display: grid;
+            grid-gap: 25px 25px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))
+            /* grid-template-columns: 1fr 1fr 1fr; */
+        }
+
+
+        /* The Modal (background) */
+
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1;
+            /* Sit on top */
+            padding-top: 75px;
+            /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.9);
+            /* Black w/ opacity */
+        }
+
+        /* Modal Content (Image) */
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            height: 85%;
+            width: auto;
+            max-width: 85%;
+            object-fit: contain;
+        }
+
+        /* Caption of Modal Image (Image Text) - Same Width as the Image */
+
+        #caption {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            height: 150px;
+        }
+
+        /* Add Animation - Zoom in the Modal */
+
+        .modal-content,
+        #caption {
+            animation-name: zoom;
+            animation-duration: 0.6s;
+        }
+
+        @keyframes zoom {
+            from {
+                transform: scale(0)
+            }
+            to {
+                transform: scale(1)
+            }
+        }
+
+        /* The Close Button */
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* 100% Image Width on Smaller Screens */
+
+        @media only screen and (max-width: 700px) {
+            .modal-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<script>
+
+
+</script>
+
+<body>
+    <div class="grid-container" id="boddy"></div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+        <!-- The Close Button -->
+        <span class="close">&times;</span>
+
+        <!-- Modal Content (The Image) -->
+        <img class="modal-content" id="img01">
+
+        <!-- Modal Caption (Image Text) -->
+        <!-- <div id="caption"></div> -->
+    </div>
+    <script>
+        var modal = document.getElementById('myModal');
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+    </script>
+</body>
+
+</html>

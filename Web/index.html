@@ -1,0 +1,597 @@
+<html>
+
+<head>
+  <title>DOUVK</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="shortcut icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:700" rel="stylesheet">
+  <style>
+    #image-container {
+      width: 300px;
+      height: 300px;
+      border: 1px solid #000;
+      background-image: url(https://drive.google.com/open?id=1AMJfLn65ag7rI78EApCfixMwItwDnMNP);
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
+
+
+    #image {
+      height: 98%;
+      width: auto;
+      object-fit: contain;
+      max-width: 98%;
+      /* position:absolute; */
+      position: relative;
+      filter: blur(0px);
+      -webkit-filter: blur(0px);
+      z-index: 4;
+
+    }
+
+    #video2 {
+      height: 98%;
+      width: auto;
+      object-fit: contain;
+      max-width: 98%;
+      /* position:absolute; */
+      position: relative;
+      filter: blur(0px);
+      -webkit-filter: blur(0px);
+      z-index: 4;
+      display: none;
+
+    }
+
+    #image2 {
+
+      z-index: 2;
+    }
+
+    #bg-image {
+      /* The image used */
+      background-image: url("owen.jpg");
+
+      position: absolute;
+      /* Add the blur effect */
+      filter: blur(8px);
+      -webkit-filter: blur(8px);
+      width: 105%;
+      /* Full height */
+      height: 105%;
+      top: 0px;
+      left: -10px;
+      /* Center and scale the image nicely */
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      z-index: 1;
+      /*   
+  background-blend-mode: darken;
+	transition: 1s; */
+      /* -webkit-transition: background-image 0.2s ease-in-out;
+transition: background-image 0.2s ease-in-out;
+   */
+    }
+
+    #douvk {
+      z-index: 5;
+      position: absolute;
+      top: 10px;
+      font-size: 2.5em;
+      color: white;
+      text-decoration: none;
+      text-shadow: 3px 3px 15px rgba(150, 150, 150, 1);
+
+    }
+
+    #time {
+      z-index: 5;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 4em;
+      color: white;
+      text-decoration: none;
+      text-shadow: 3px 3px 15px rgba(150, 150, 150, 1);
+
+    }
+
+    #gear {
+      z-index: 5;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 4em;
+      fill: white;
+      color: white;
+      text-decoration: none;
+      text-shadow: 3px 3px 15px rgba(150, 150, 150, 1);
+      cursor: pointer;
+
+    }
+
+    #control1 {
+      z-index: 5;
+      position: absolute;
+      bottom: 10px;
+      left: 40px;
+      font-size: 4em;
+      fill: white;
+      color: white;
+      text-decoration: none;
+      text-shadow: 3px 3px 15px rgba(150, 150, 150, 1);
+      cursor: pointer;
+      visibility: hidden;
+
+    }
+
+
+    #control2 {
+      z-index: 5;
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 4em;
+      fill: white;
+      color: white;
+      text-decoration: none;
+      text-shadow: 3px 3px 15px rgba(150, 150, 150, 1);
+      cursor: pointer;
+      visibility: hidden;
+
+    }
+
+    #control3 {
+      z-index: 5;
+      position: absolute;
+      bottom: 10px;
+      left: 70px;
+      font-size: 4em;
+      fill: white;
+      color: white;
+      text-decoration: none;
+      text-shadow: 3px 3px 15px rgba(150, 150, 150, 1);
+      cursor: pointer;
+      visibility: hidden;
+
+    }
+
+
+    body {
+      overflow: hidden;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 50%;
+
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
+  <!-- <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha512.js"></script> -->
+  <script>
+
+  
+    
+
+    function shuffle(a) {
+      var j, x, i;
+      for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+      }
+      return a;
+    }
+
+    function getURL(doc) {
+      storageRef.child(doc.id).getDownloadURL().then(function (url) {
+        var test = url;
+        // alert(url);
+        imageArray.push([test, doc.data().metadata.contentType])
+        //imageArray=[["https://firebasestorage.googleapis.com/v0/b/douvk-51ac9.appspot.com/o/1540755701944-DiscreteOldfashionedAllosaurus.webm?alt=media&token=f9c6fda8-4eab-4527-9e03-e719e5792f69","video/webm"]]
+        //imageArray=[[test, doc.data().metadata.contentType]]
+        //document.getElementById('bg-image').style.backgroundImage = "url("+test+")"
+        //document.getElementById("image").src=test;
+        shuffledArray = shuffle(imageArray)
+      }).catch(function (error) {
+
+      });
+    }
+
+    var preloadArray = ["1.jpg", "2.jpg", "3.jpg", "7.jpg", "8.jpeg", "9.jpg", "11.jpg", "12.jpg"]
+    var nextImage
+    preloadImage(["img/" + preloadArray[Math.floor(Math.random() * preloadArray.length)], "image"])
+    var imageArray = []
+    var shuffledArray;
+    var ImageInterval = 5000;
+    var count = 0;
+    var hash = "299265865"
+    var loggedIn = localStorage.getItem('loggedIn');
+    var paused = false;
+    var forward1 = true;
+
+    String.prototype.hashCode = function () {
+      var hash = 0;
+      if (this.length == 0) return hash;
+      for (i = 0; i < this.length; i++) {
+        char = this.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+      }
+      return hash;
+    }
+
+    function checkPassword() {
+      x = prompt("Enter the Password");
+      if ((x.hashCode()) == hash) {
+        //console.log(x.hashCode());
+        localStorage.setItem('loggedIn', true)
+        document.onkeyup = function (e) {
+          console.log(e.which)
+          if (e.which == 27) {
+             var url= "https://en.wikipedia.org/wiki/Special:Random"; 
+            window.location = url;
+          }
+          if (e.which == 37) {
+            back();
+          }
+          if (e.which == 39) {
+            forward();
+          }
+          if (e.which == 32) {
+            pauseplay();
+          }
+
+        }
+        document.getElementById("control1").style.visibility = "visible";
+        document.getElementById("control2").style.visibility = "visible";
+        document.getElementById("control3").style.visibility = "visible";
+        main()
+      } else {
+        checkPassword()
+      }
+
+    }
+    //checkPassword()
+
+    // Initialize Firebase
+
+
+    var config = {
+      apiKey: "AIzaSyBw-iGyHNxICd_9BbZfHu5IyNUc94STFvI",
+      authDomain: "douvk-51ac9.firebaseapp.com",
+      databaseURL: "https://douvk-51ac9.firebaseio.com",
+      projectId: "douvk-51ac9",
+      storageBucket: "douvk-51ac9.appspot.com",
+      messagingSenderId: "667447476369"
+    };
+    firebase.initializeApp(config);
+    var storage = firebase.storage();
+
+    // Initialize Cloud Firestore through Firebase
+    var db = firebase.firestore();
+    var storageRef = storage.ref("_main");
+
+
+
+    // Disable deprecated features
+    db.settings({
+      timestampsInSnapshots: true
+    });
+    db.collection("images_main").get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        //console.log(`${doc.id} => ${doc.data()}`);
+        //console.log(doc.data().metadata.contentType)
+        getURL(doc);
+
+
+
+      });
+      shuffledArray = shuffle(imageArray)
+      if (loggedIn == "true") {
+        main()
+        document.onkeyup = function (e) {
+          console.log(e.which)
+          if (e.which == 27) {
+             var url= "https://en.wikipedia.org/wiki/Special:Random"; 
+            window.location = url;
+          }
+          if (e.which == 37) {
+            back();
+          }
+          if (e.which == 39) {
+            forward();
+          }
+          if (e.which == 32) {
+            pauseplay();
+          }
+        }
+        document.getElementById("control1").style.visibility = "visible";
+        document.getElementById("control2").style.visibility = "visible";
+        document.getElementById("control3").style.visibility = "visible";
+      } else {
+        checkPassword()
+      }
+
+      //console.log(imageArray)
+      //shuffledArray = shuffle(imageArray)
+
+      // setInterval(function () {
+      //   image = shuffledArray[count];
+      //   console.log(count);
+      //   console.log(ImageInterval)
+      //   if (count < shuffledArray.length - 1) {
+      //     count++
+      //   } else {
+      //     count = 0;
+      //   }
+      //   //image = imageArray[Math.floor(Math.random()*imageArray.length)]
+      //   console.log(nextImage)
+      //   document.getElementById("image").style.display = "none";
+      //   document.getElementById("video2").style.display = "block";
+      //   if (nextImage[1].includes("video")) {
+      //     document.getElementById("video").src = nextImage[0]
+      //     document.getElementById("video").type = nextImage[1]
+      //     document.getElementById("video2").load()
+      //     document.getElementById("video2").play()
+      //     document.getElementById('bg-image').style.backgroundImage = "url(" + nextImage[0] + ")"
+
+      //   } else {
+
+      //     document.getElementById("video2").style.display = "none";
+      //     document.getElementById("image").style.display = "block";
+      //     document.getElementById('bg-image').style.backgroundImage = "url(" + nextImage[0] + ")"
+      //     document.getElementById("image").src = nextImage[0];
+      //   }
+      //   preloadImage(image)
+
+      // }, window.ImageInterval);
+    });
+
+    function pauseplay() {
+      if (paused) {
+        paused = false
+        main()
+        document.getElementById("control1").src = "pause.png"
+      } else {
+        paused = true
+        document.getElementById("control1").src = "play1.png"
+      }
+
+
+    }
+
+
+
+    function forward() {
+
+      console.log(count);
+      console.log(ImageInterval - 1)
+      //image = shuffledArray[count-1];
+      if (!forward1) {
+        forward1 = true
+        image = shuffledArray[count];
+        if (count < shuffledArray.length) {
+          count++
+        } else {
+          count = 0;
+        }
+      } else {
+        image = shuffledArray[count - 1];
+      }
+
+      if (count < shuffledArray.length) {
+        count++
+      } else {
+        count = 0;
+      }
+
+      //image = imageArray[Math.floor(Math.random()*imageArray.length)]
+      console.log(image)
+      document.getElementById("image").style.display = "none";
+      document.getElementById("video2").style.display = "block";
+      if (image[1].includes("video")) {
+        document.getElementById("video").src = image[0]
+        document.getElementById("video").type = image[1]
+        document.getElementById("video2").load()
+        document.getElementById("video2").play()
+        document.getElementById('bg-image').style.backgroundImage = "url(" + image[0] + ")"
+
+      } else {
+
+        document.getElementById("video2").style.display = "none";
+        document.getElementById("image").style.display = "block";
+        document.getElementById('bg-image').style.backgroundImage = "url(" + image[0] + ")"
+        document.getElementById("image").src = image[0];
+      }
+
+    }
+
+    function back() {
+
+      console.log(count);
+      console.log(ImageInterval)
+      if (count > 0) {
+        count--
+      } else {
+        count = shuffledArray.length - 1;
+      }
+
+      if (forward1) {
+        forward1 = false
+        image = shuffledArray[count - 2];
+        if (count > 0) {
+          count--
+        } else {
+          count = shuffledArray.length - 1;
+        }
+      } else {
+        image = shuffledArray[count - 1];
+      }
+
+
+
+
+
+      //image = shuffledArray[count - 1];
+      //image = imageArray[Math.floor(Math.random()*imageArray.length)]
+      console.log(image)
+      document.getElementById("image").style.display = "none";
+      document.getElementById("video2").style.display = "block";
+      if (image[1].includes("video")) {
+        document.getElementById("video").src = image[0]
+        document.getElementById("video").type = image[1]
+        document.getElementById("video2").load()
+        document.getElementById("video2").play()
+        document.getElementById('bg-image').style.backgroundImage = "url(" + image[0] + ")"
+
+      } else {
+
+        document.getElementById("video2").style.display = "none";
+        document.getElementById("image").style.display = "block";
+        document.getElementById('bg-image').style.backgroundImage = "url(" + image[0] + ")"
+        document.getElementById("image").src = image[0];
+      }
+
+    }
+
+    function main() {
+      if (!paused) {
+        image = shuffledArray[count];
+        console.log(count);
+        console.log(ImageInterval)
+        if (count < shuffledArray.length - 1) {
+          count++
+        } else {
+          count = 0;
+        }
+        //image = imageArray[Math.floor(Math.random()*imageArray.length)]
+        console.log(nextImage)
+        document.getElementById("image").style.display = "none";
+        document.getElementById("video2").style.display = "block";
+        if (nextImage[1].includes("video")) {
+          document.getElementById("video").src = nextImage[0]
+          document.getElementById("video").type = nextImage[1]
+          document.getElementById("video2").load()
+          document.getElementById("video2").play()
+          document.getElementById('bg-image').style.backgroundImage = "url(" + nextImage[0] + ")"
+
+        } else {
+
+          document.getElementById("video2").style.display = "none";
+          document.getElementById("image").style.display = "block";
+          document.getElementById('bg-image').style.backgroundImage = "url(" + nextImage[0] + ")"
+          document.getElementById("image").src = nextImage[0];
+        }
+        preloadImage(image)
+        t = setTimeout(function () {
+          main()
+        }, ImageInterval);
+      }
+    }
+
+    function settings() {
+      var x = prompt("Image interval in seconds", "5");
+      var num1 = parseInt(x);
+      if (num1 > 0) {
+        ImageInterval = num1 * 1000
+
+      }
+    }
+    function preloadImage(url) //Preload images to avoid stutter
+    {
+      try {
+        if (url[1].includes("video")) {
+
+
+          //var video = new Video();
+          //video.src = url[0];
+          nextImage = url;
+        }
+        else {
+          var img = new Image();
+          img.src = url[0];
+          nextImage = url;
+        }
+      } catch (e) {
+        console.log("Failed to load")
+        console.log(e)
+      }
+
+    }
+
+
+  </script>
+</head>
+
+<body>
+
+
+  <div id="bg-image">
+
+
+  </div>
+  <div id="image2">
+    <video id="video2" class='center' loop width="320" height="240" muted autoplay>
+      <source id="video">
+    </video>
+    <img id='image' class='center'></img>
+
+  </div>
+
+  <a id="douvk" href="submit.html">#DOUVK</a>
+  <a href="all.html" id="time">#DOUVK</a>
+  <img id="gear" src="gear.png" onclick="settings()"></img>
+  <img id="control1" src="pause.png" onclick="pauseplay()"></img>
+  <img id="control2" src="play2.png" onclick="back()"></img>
+  <img id="control3" src="play3.png" onclick="forward()"></img>
+  <script>
+
+    TempImage = "img/" + preloadArray[Math.floor(Math.random() * preloadArray.length)]
+    document.getElementById('bg-image').style.backgroundImage = "url(" + TempImage + ")"
+    document.getElementById("image").src = TempImage
+    //time //////////////////////////////////////////////////////////////////
+    function checkTime(i) {
+      if (i < 10) {
+        i = "0" + i;
+      }
+      return i;
+    }
+
+
+
+    function startTime() {
+      var today = new Date();
+      var h = today.getHours();
+      var m = today.getMinutes();
+      var s = today.getSeconds();
+      // add a zero in front of numbers<10
+      m = checkTime(m);
+      s = checkTime(s);
+      document.getElementById('time').innerHTML = h + ":" + m;
+
+      t = setTimeout(function () {
+        startTime()
+      }, 5000);
+    }
+    startTime();</script>
+
+  <!-- <iframe src="https://drive.google.com/file/d/1AMJfLn65ag7rI78EApCfixMwItwDnMNP/view?usp=sharing" width='100%' height='1000' frameborder="0"></iframe> -->
+
+
+
+
+
+
+</body>
+
+</html>
