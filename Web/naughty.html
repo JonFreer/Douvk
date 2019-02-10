@@ -4,7 +4,7 @@
     <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
-    <title>Douvk Wall</title>
+    <title>Naughty Wall</title>
     <link rel="shortcut icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <script>
         var loggedIn = localStorage.getItem('loggedIn');
@@ -42,20 +42,11 @@
             }
         }
 
-        document.onkeyup = function (e) {
-          console.log(e.which)
-          if (e.which == 27) {
-            modal.style.display = "none";
-          }
-        }
-
 
         var imageArray = [];
-        var idArray =[];
-        var urlArray = [];
-        var nsfwArray = [];
-        var dict =[];
-        divString = "";
+        var idArray =[];;
+        var urlArray = []
+        divString = ""
         var imgID;
 
         firebase.initializeApp(config);
@@ -74,21 +65,29 @@
             db.collection("images_main").get().then((querySnapshot) => {
                 querySnapshot.forEach((doc) => {
                     console.log(`${doc.id} => ${doc.data()}`);
-                    if(!doc.data().deleted){
+                    if(doc.data().nsfw && !doc.data().deleted){
                     storageRef.child("thumb@256_" + doc.id).getDownloadURL().then(function (url) {
                         var test = url;
+                        // alert(url);
+                        imageArray.push(test)
+                      
+
                         storageRef2.child(doc.id).getDownloadURL().then(function (url) {
                             //url is url of image
                             count++
-                            dict.push({id:doc.id,nsfw:doc.data().nsfw,URL:url})
+                            console.log(doc.id)
+                            idArray.push(doc.id)
+                            urlArray.push(url)
                             divString += '<div id="imagediv"><img id="img' + count + '" onclick="openModal(' + count + ')" class="myImg" src=' + test + '></div>'
+                            //document.getElementById('bg-image').style.backgroundImage = "url("+test+")"
+                            //document.getElementById("image").src=test;
                             document.getElementById("boddy").innerHTML = divString
                         })
                     }).catch(function (error) {
 
                     });
-
                     }
+
                 });
 
             });
@@ -112,20 +111,10 @@
             var modal = document.getElementById('myModal');
             var img = document.getElementById('img' + id);
             var modalImg = document.getElementById("img01");
-
             //var captionText = document.getElementById("caption");
             modal.style.display = "block";
-            modalImg.src = dict[id - 1].URL;
-            imgID  = dict[id-1].id;
-            // console.log(nsfwArray[id-1])
-            console.log(id-1)
-            console.log(dict[id-1])
-            if(dict[id-1].nsfw){
-                document.getElementsByClassName("flag")[0].style.visibility = "hidden";
-
-            }else{
-                document.getElementsByClassName("flag")[0].style.visibility = "visible";
-            }
+            modalImg.src = urlArray[id - 1];
+            imgID  = idArray[id-1];
             //captionText.innerHTML = "Download";
         }
 
@@ -324,10 +313,10 @@
 
         var bin  = document.getElementsByClassName("bin")[0];
         flag.onclick = function(){
-            c = confirm("Are you sure you want to add this item to the Naughty List? It wont remove it from douvk wall.")
+            c = confirm("Remove from naugty wall?")
             if(c){
                 console.log(imgID);
-                db.collection("images_main").doc(imgID).update({nsfw:true})
+                db.collection("images_main").doc(imgID).update({nsfw:false})
             }
 
         }
@@ -339,7 +328,6 @@
                 db.collection("images_main").doc(imgID).update({deleted:true})
             }
         }
-
         // When the user clicks on <span> (x), close the modal
         span.onclick = function () {
             modal.style.display = "none";

@@ -291,7 +291,9 @@ transition: background-image 0.2s ease-in-out;
       querySnapshot.forEach((doc) => {
         //console.log(`${doc.id} => ${doc.data()}`);
         //console.log(doc.data().metadata.contentType)
-        getURL(doc);
+        if(!doc.data().nsfw && !doc.data().deleted){
+          getURL(doc);
+        }
 
 
 
@@ -321,40 +323,6 @@ transition: background-image 0.2s ease-in-out;
       } else {
         checkPassword()
       }
-
-      //console.log(imageArray)
-      //shuffledArray = shuffle(imageArray)
-
-      // setInterval(function () {
-      //   image = shuffledArray[count];
-      //   console.log(count);
-      //   console.log(ImageInterval)
-      //   if (count < shuffledArray.length - 1) {
-      //     count++
-      //   } else {
-      //     count = 0;
-      //   }
-      //   //image = imageArray[Math.floor(Math.random()*imageArray.length)]
-      //   console.log(nextImage)
-      //   document.getElementById("image").style.display = "none";
-      //   document.getElementById("video2").style.display = "block";
-      //   if (nextImage[1].includes("video")) {
-      //     document.getElementById("video").src = nextImage[0]
-      //     document.getElementById("video").type = nextImage[1]
-      //     document.getElementById("video2").load()
-      //     document.getElementById("video2").play()
-      //     document.getElementById('bg-image').style.backgroundImage = "url(" + nextImage[0] + ")"
-
-      //   } else {
-
-      //     document.getElementById("video2").style.display = "none";
-      //     document.getElementById("image").style.display = "block";
-      //     document.getElementById('bg-image').style.backgroundImage = "url(" + nextImage[0] + ")"
-      //     document.getElementById("image").src = nextImage[0];
-      //   }
-      //   preloadImage(image)
-
-      // }, window.ImageInterval);
     });
 
     function pauseplay() {
@@ -370,16 +338,24 @@ transition: background-image 0.2s ease-in-out;
 
     }
 
+    function flag(){
+
+       var c = confirm("Are you sure you want to flag for being VNSFW? You will still be able to view the image on the DouvkWall.");
+       if(c){
+         
+       }
+    }
 
 
     function forward() {
 
       console.log(count);
       console.log(ImageInterval - 1)
-      //image = shuffledArray[count-1];
       if (!forward1) {
         forward1 = true
+        
         image = shuffledArray[count];
+
         if (count < shuffledArray.length) {
           count++
         } else {
@@ -395,7 +371,6 @@ transition: background-image 0.2s ease-in-out;
         count = 0;
       }
 
-      //image = imageArray[Math.floor(Math.random()*imageArray.length)]
       console.log(image)
       document.getElementById("image").style.display = "none";
       document.getElementById("video2").style.display = "block";
@@ -475,7 +450,7 @@ transition: background-image 0.2s ease-in-out;
           count = 0;
         }
         //image = imageArray[Math.floor(Math.random()*imageArray.length)]
-        console.log(nextImage)
+        console.log(nextImage) //Here is where we are getting them
         document.getElementById("image").style.display = "none";
         document.getElementById("video2").style.display = "block";
         if (nextImage[1].includes("video")) {
